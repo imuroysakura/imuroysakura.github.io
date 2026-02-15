@@ -2,13 +2,182 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Heya of Imuroy</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imuroy Showroom - Centered Cards</title>
     <style>
-        body { background-color: #f0f9ff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: sans-serif; }
-        h1 { color: #0ea5e9; border-bottom: 2px solid #0ea5e9; padding-bottom: 10px; }
+        /* 1. 스크롤 스냅 및 기본 설정 */
+        body, html { 
+            margin: 0; padding: 0; 
+            height: 100%; 
+            overflow-y: auto; 
+            scroll-snap-type: y mandatory; 
+            background: #F0F2F5;
+            scroll-behavior: smooth;
+        }
+
+        .fixed-frame { 
+            position: fixed; width: 100%; height: 80px; 
+            background: rgba(0, 0, 0, 0.85); color: #EEE; 
+            font-size: 24px; display: flex; align-items: center; 
+            justify-content: center; z-index: 1000; 
+        }
+        .top-frame { top: 0; }
+        .bottom-frame { bottom: 0; }
+
+        .container { width: 100%; }
+
+        .section { 
+            position: relative; width: 100vw; height: 100vh; 
+            display: flex; align-items: center; justify-content: center;
+            scroll-snap-align: start; 
+        }
+
+        /* 섹션별 파스텔 배경 */
+        .s1 { background: #FFEBEE; } .s2 { background: #E3F2FD; } .s3 { background: #E8F5E9; } .s4 { background: #FFFDE7; } .s5 { background: #F3E5F5; }
+
+        /* 16:9 필름 영역 (창문 역할) */
+        .pc-area { 
+            position: absolute; width: 100%; height: calc(100vw * 9 / 16); 
+            max-height: 70vh; 
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.4); 
+            border-top: 3px dashed rgba(0,0,0,0.1); 
+            border-bottom: 3px dashed rgba(0,0,0,0.1);
+        }
+
+        /* 세이프존 (디자인 가이드라인용) */
+        .safe-zone { 
+            position: absolute; 
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: min(70vh, 100vw); 
+            height: min(70vh, 100vw); 
+            border: 4px solid rgba(255, 171, 145, 0.5);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* --- 가로 슬라이드 핵심 스타일 --- */
+        .card-track {
+            display: flex;
+            position: absolute;
+            top: 0;
+            left: 50%; /* 기준점을 중앙으로 설정 */
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            align-items: center;
+            gap: 40px; /* 카드 사이 간격 */
+            padding: 0;
+            will-change: transform;
+        }
+
+        .test-card {
+            /* 조건 2: 화면 높이에 따라 크기가 일정하도록 vh 사용 */
+            width: min(60vh, 80vw); 
+            height: 80%;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #555;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            /* 조건 1: 카드의 중심을 track의 left 위치에 맞춤 */
+            transform: translateX(-50%);
+        }
+
+        .slide-btn {
+            position: absolute;
+            right: 40px;
+            bottom: 40px;
+            padding: 12px 24px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #4DD0E1;
+            border: 2px solid #4DD0E1;
+            border-radius: 30px;
+            cursor: pointer;
+            z-index: 100;
+            font-weight: bold;
+        }
+
+        /* 스파인 고정 영역 */
+        .spine-object-area {
+            position: fixed; z-index: 500;
+            --safe-size: min(70vh, 100vw);
+            width: calc(var(--safe-size) * 0.7); height: calc(var(--safe-size) * 0.7);
+            top: 50%; transform: translateY(-50%);
+            left: calc(50% - (var(--safe-size) / 2) - (var(--safe-size) * 0.7 * 0.25));
+            border: 4px solid #4DD0E1; background-color: rgba(178, 235, 242, 0.6); 
+            display: flex; align-items: center; justify-content: center;
+            color: #00838F; font-weight: bold; pointer-events: none;
+        }
     </style>
 </head>
+
 <body>
-    <h1>이무로이의 공식 쇼룸 준비 중...</h1>
+    <div class="spine-object-area">SPINE AREA</div>
+    <div class="fixed-frame top-frame">SECTION <span id="section-num">1</span></div>
+
+    <div class="container">
+        <div class="section s1">
+            <div class="safe-zone"></div>
+            <div class="pc-area">
+                <div class="card-track" id="track-1">
+                    <div class="test-card">INFO 01<br><small>이무로이 프로필</small></div>
+                    <div class="test-card">INFO 02<br><small>스킬 설명</small></div>
+                    <div class="test-card">INFO 03<br><small>비주얼 갤러리</small></div>
+                    <div class="test-card">INFO 04<br><small>성우 정보</small></div>
+                </div>
+                <button class="slide-btn" onclick="moveTrack(1)">NEXT INFO ▶</button>
+            </div>
+        </div>
+
+        <div class="section s2">
+            <div class="safe-zone"></div>
+            <div class="pc-area">
+                <div class="card-track" id="track-2">
+                    <div class="test-card">INFO 01<br><small>섹션 2 내용</small></div>
+                    <div class="test-card">INFO 02<br><small>상세 정보</small></div>
+                </div>
+                <button class="slide-btn" onclick="moveTrack(2)">NEXT INFO ▶</button>
+            </div>
+        </div>
+        
+        </div>
+
+    <div class="fixed-frame bottom-frame">BOTTOM FRAME - IMUROY SHOWROOM</div>
+
+    <script>
+        // 상단 섹션 번호 표시
+        window.addEventListener('scroll', () => {
+            const vh = window.innerHeight;
+            const scrollPos = window.scrollY;
+            document.getElementById('section-num').innerText = Math.round(scrollPos / vh) + 1;
+        });
+
+        // 섹션별 카드 인덱스 관리
+        let currentIndices = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+
+        function moveTrack(sectionNum) {
+            const track = document.getElementById(`track-${sectionNum}`);
+            const cards = track.querySelectorAll('.test-card');
+            
+            currentIndices[sectionNum]++;
+            if (currentIndices[sectionNum] >= cards.length) {
+                currentIndices[sectionNum] = 0;
+            }
+
+            // 실시간 카드 너비 계산 (반응형 대응)
+            const cardWidth = cards[0].offsetWidth;
+            const gap = 40; // CSS gap과 일치해야 함
+            const moveX = currentIndices[sectionNum] * (cardWidth + gap);
+            
+            track.style.transform = `translateX(-${moveX}px)`;
+        }
+    </script>
 </body>
 </html>
