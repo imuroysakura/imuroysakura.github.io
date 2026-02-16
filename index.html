@@ -5,6 +5,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Imuroy Showroom - Centered Cards</title>
     <style>
+/* 1. 컨테이너에 스케일 변수 설정 */
+:root {
+    /* 1920px를 기준으로 현재 화면 폭의 비율을 계산합니다. */
+    /* clamp를 통해 최소 1배에서 최대 1.5배(울트라와이드용)까지만 커지도록 제한했습니다. */
+    --scale-factor: clamp(1, 100vw / 1920, 1.5);
+}
+
+/* 2. 16:9 필름 영역(pc-area)에 스케일 적용 */
+.pc-area { 
+    position: absolute; 
+    width: 100%; 
+    height: calc(100vw * 9 / 16); 
+    max-height: 70vh; 
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.4); 
+    border-top: 3px dashed rgba(0,0,0,0.1); 
+    border-bottom: 3px dashed rgba(0,0,0,0.1);
+    
+    /* 추가된 부분: 중앙을 기준으로 내부 요소 전체를 키움 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 3. 스케일링의 영향을 받을 내부 래퍼 추가 (선택사항이나 권장) */
+/* 아래 transform을 card-track과 safe-zone이 공유하게 함으로써 레이아웃을 유지합니다. */
+.card-track, .safe-zone {
+    transform-origin: center center;
+}
+
+/* 4. 스파인 고정 영역 스케일 보정 */
+.spine-object-area {
+    position: fixed; 
+    z-index: 500;
+    --safe-size: min(70vh, 100vw);
+    width: calc(var(--safe-size) * 0.7); 
+    height: calc(var(--safe-size) * 0.7);
+    top: 50%; 
+    
+    /* 추가된 부분: 전체 스케일에 맞춰 캐릭터 크기와 위치도 보정 */
+    left: calc(50% - (var(--safe-size) / 2) - (var(--safe-size) * 0.7 * 0.25));
+    transform: translateY(-50%) scale(var(--scale-factor));
+    transform-origin: left center; /* 왼쪽 기준으로 커져야 카드와 겹치지 않음 */
+    
+    border: 4px solid #4DD0E1; 
+    background-color: rgba(178, 235, 242, 0.6); 
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    color: #00838F; 
+    font-weight: bold; 
+    pointer-events: none;
+    transition: transform 0.2s ease-out; /* 부드러운 스케일 변화 */
+}
+
+/* 5. 가로 트랙 스케일 적용 */
+.card-track {
+    /* 기존 transform에 scale 추가 */
+    /* 현재 JS에서 transform을 직접 조절하므로, CSS에서는 기본 scale만 설정 */
+    zoom: var(--scale-factor); /* scale 대신 zoom을 쓰면 레이아웃 계산이 더 깔끔할 수 있음 */
+}
+
+
         /* 1. 스크롤 스냅 및 기본 설정 */
         body, html { 
             margin: 0; padding: 0; 
